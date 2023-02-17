@@ -18,7 +18,27 @@ jobs:
               --stack-name myStack-${CIRCLE_WORKFLOW_ID:0:5} \
               --region us-east-1
               - destroy_environment
+        
+  configure_infrastructure: 
+    docker:
+      - image: python:3.7-alpine3.11
+    steps:
+      - checkout
+      - add_ssh_keys:
+              # You can get this ID in the section where you registered the SSH Key
+              fingerprints: ["a2:1f:59:c5:14:37:79:a9:2d:c3:d6:69:18:af:5b:b8"] 
+      - run:
+          name: Install Ansible
+          command: | 
+           apk add --update ansible
+            # Install Ansible
+      - run:
+          name: Run Playbook and Configure server
+          command: | 
+           ansible-playbook -i inventory main.yml
+
 workflows:
-  say-hello-workflow:
+  say-workflow:
     jobs:
       - create_infrastructure
+      - configure_infrastructure
